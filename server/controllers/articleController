@@ -1,0 +1,136 @@
+const ApiError = require('../error/ApiError')
+const {Conference} = require("../models/models");
+const {User} = require("../models/models");
+const {Favourite} = require("../models/models");
+const {FavouriteList, Comment} = require("../models/models");
+const {Article} = require('../models/models')
+const {Op} = require('sequelize')
+
+class ArticleController {
+
+    async create(req, res, next) {
+        try {
+            const {
+                id, title, published, links, articleRating, authorRating,
+                summary, authors, references, conference, citations
+            } = req.body
+            let conf;
+            let conferenceId;
+            if (conference) {
+                conf = await Conference.findOne({
+                    where: {
+                        name: conference
+                    }
+                })
+                if (!conf) {
+                    conf = await Conference.create({
+                        name: conference
+                    })
+                }
+                conferenceId = conf.get("id")
+            }
+            const article = await Article.create({
+                id, title, published, links, articleRating, authorRating,
+                summary, authors, references, conferenceId, citations
+            })
+            return res.json(article)
+        } catch (e) {
+            next(ApiError.badRequest(e))
+        }
+    }
+
+    async getAll(req, res, next) {
+        try {
+            const {
+                conference, order, year, sort_by, min_article_rating,
+                min_author_rating, search, page, limit
+            } = req.query
+            const where = {}
+            if (search) {
+                where.title = { [Op.iLike] : '%' + search + '%' }
+            }
+            if (min_article_rating) {
+                where.articleRating = { [Op.gte] : min_article_rating }
+            }
+            if (min_author_rating) {
+                where.authorRating = { [Op.gte] : min_author_rating }
+            }
+            if (year) {
+                where.published = { [Op.gte] : new Date(year, 0, 1) }
+            }
+            const confWhere = {};
+            if (conference) {
+                confWhere.name = { [Op.or]: conference }
+            }
+            const articles = await Article.findAndCountAll({
+                where: where,
+                order: [
+                    [sort_by, order],
+                    ['id', 'ASC']
+                ],
+                include: {
+                    model: Conference,
+                    where: confWhere
+                },
+                limit: limit,
+                offset: limit * page
+            })
+            return res.json(articles)
+        } catch (e) {
+            next(ApiError.badRequest("Some error occured"))
+        }
+    }
+
+    async getIds(req, res, next) {
+        try {
+            const ids = await Article.findAll({
+                attributes: ['id']
+            })
+            return res.json(ids)
+        } catch (e) {
+            next(ApiError.badRequest("Some error occured"))
+        }
+    }
+
+    async getById(req, res, next) {
+        try {
+            const {id, userId} = req.query
+            if (!id) {
+                return next(ApiError.badRequest('No article id'))
+            }
+            const include = [{
+                attributes: ['id', 'text', 'datetime'],
+                model: Comment,
+                include: {
+                    attributes: ['id', 'username'],
+                    model: User
+                }
+            }]
+            if (userId) {
+                include.push({
+                    model: Favourite,
+                    where: {
+                        articleId: id
+                    },
+                    required: false,
+                    include: {
+                        model: FavouriteList,
+                        where: {
+                            userId
+                        }
+                    }
+                })
+            }
+            const article = await Article.findOne({
+                where: {id},
+                include
+            })
+            return res.json(article)
+        } catch (e) {
+            next(ApiError.badRequest(e))
+        }
+    }
+
+}
+
+module.exports = new ArticleController()
