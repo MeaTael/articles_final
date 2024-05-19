@@ -81,10 +81,12 @@ const Article = observer(() => {
         setComments(response.data.comments)
         setIsFavourite(response.data.favourites?.length)
       });
-      getFavouriteLists().then(response => {
-        console.log(response.data.rows)
-        setFavouriteLists(response.data.rows)
-      })
+      if (user.isAuth) {
+        getFavouriteLists().then(response => {
+          console.log(response.data.rows)
+          setFavouriteLists(response.data.rows)
+        })
+      }
     } catch (err) {
       console.log("Error", err.message)
     }
