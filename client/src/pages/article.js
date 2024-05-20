@@ -26,6 +26,7 @@ const Article = observer(() => {
   const history = useNavigate()
   const [article, setArticle] = useState({});
   const [show, setShow] = useState(false);
+  const [showSimilar, setShowSimilar] = useState(false)
   const [searchInput, setSearchInput] = useState("")
   const [isFavourite, setIsFavourite] = useState(false)
   const [favouriteLists, setFavouriteLists] = useState([])
@@ -40,6 +41,8 @@ const Article = observer(() => {
     setSearchInput("")
   };
   const handleShow = () => setShow(true);
+
+  const handleShowSimilar = () => setShowSimilar(prevState => !prevState)
 
   const renderTooltipArticle = (props) => (
     <Tooltip id="article-tooltip" {...props}>
@@ -250,9 +253,14 @@ const Article = observer(() => {
           <div className='text-secondary mb-2' style={{display: "flex", alignItems: "center", margin: 5}}><Latex>{article.summary && article.summary}</Latex></div>
           <div className="text-secondary mb-5">- {article.authors}</div>
           <Row>
-            <Button variant="light" onClick={handleShow} style={{alignItems: "center"}}>
-            Citations
-            </Button>
+            <Col>
+              <Button className="align-self-end" variant="outline-dark" onClick={handleShow} style={{alignItems: "center"}}>
+                Citations
+              </Button>
+            </Col>
+            <Col className="d-flex justify-content-end">
+              <Button variant="outline-dark" onClick={handleShowSimilar}>Similar articles</Button>
+            </Col>
             <Offcanvas show={show} onHide={handleClose} placement='bottom' scroll="true">
               <Offcanvas.Header closeButton>
                 <Offcanvas.Title>Articles that have cited this document</Offcanvas.Title>
@@ -275,8 +283,24 @@ const Article = observer(() => {
                 })}
               </ListGroup>
             </Offcanvas>
+            <Offcanvas show={showSimilar} onHide={handleShowSimilar} placement='bottom' scroll="true">
+              <Offcanvas.Header closeButton>
+                <Offcanvas.Title>Similar articles</Offcanvas.Title>
+              </Offcanvas.Header>
+              <ListGroup style={{overflowY: 'scroll'}}>
+                {article.similarArticles?.map(article => {
+                  return (
+                      <ListGroup.Item key={article.id}>
+                        <div>
+                          {<Link to={`/article/${article.id}`} style={{ textDecoration: 'none' }}>{article.title}</Link>}
+                        </div>
+                      </ListGroup.Item>
+                  )
+                })}
+              </ListGroup>
+            </Offcanvas>
           </Row>
-          <Row>
+          <Row style={{marginTop: "10px"}}>
             <Stack direction="horizontal" gap={4}>
               <div className='text-secondary mb-5'>{article.links && (not_pdf_links(article.links) ? "Other Links" : "")}</div>
               <div className='text-secondary mb-5'>{article.links &&
@@ -288,11 +312,11 @@ const Article = observer(() => {
           </Row>
           <Row>
             <Col>
-              <Button className="align-self-auto" variant="outline-dark" onClick={() => history(HOME_ROUTE)} style={{ display: "flex", alignItems: "center", marginTop: 25 }}>Back to Home</Button>
+              <Button variant="outline-dark" onClick={() => history(HOME_ROUTE)} style={{ display: "flex", alignItems: "center", marginTop: 25 }}>Back to Home</Button>
             </Col>
             {user.isAuth ? <Col className="d-flex justify-content-end">
               {isFavourite ?
-                  <Button className="align-self-end" variant="outline-danger" onClick={() => removeFromFavourites()}>Remove from favourites</Button>
+                    <Button className="align-self-end" variant="outline-danger" onClick={() => removeFromFavourites()}>Remove from favourites</Button>
                   :
                   <DropdownButton className="align-self-end"
                                   key="favourites"

@@ -131,6 +131,25 @@ class ArticleController {
         }
     }
 
+    async getSummaries(req, res, next) {
+        const articles = await Article.findAndCountAll({
+            attributes: ['id', 'title', 'summary']
+        })
+        return res.json(articles)
+    }
+
+    async loadSimilar(req, res, next) {
+        const {articleId, similarArticles} = req.body
+        const count = await Article.update({
+            similarArticles: similarArticles
+        }, {
+            where: {
+                id: articleId
+            }
+        })
+        return res.json(count)
+    }
+
 }
 
 module.exports = new ArticleController()

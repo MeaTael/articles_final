@@ -27,13 +27,12 @@ const Article = sequelize.define('article', {
     authors: {type: DataTypes.TEXT, allowNull: false},
     references: {type: DataTypes.JSON, allowNull: false},
     citations: {type: DataTypes.JSON, allowNull: false},
-    views_count: {type: DataTypes.INTEGER, default: 0},
+    similarArticles: {type: DataTypes.JSON}
 })
 
 const Conference = sequelize.define('conference', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING, allowNull: false},
-    views_count: {type: DataTypes.INTEGER, default: 0},
 })
 
 const Comment = sequelize.define('comment', {
