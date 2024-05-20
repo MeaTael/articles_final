@@ -342,7 +342,7 @@ const Article = observer(() => {
             }
           </Row>
           <Row>
-            <div>Comments</div>
+            <div style={{marginTop: "20px"}}>Comments</div>
             {user.isAuth ?
               <InputGroup>
                 <Form.Control
