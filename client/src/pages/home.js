@@ -324,6 +324,9 @@ const Home = () => {
                                       placeholder='Choose year'
                                       onChange={(e) => {handleYearChange(e.target.value)}}/>
                     </Col> : null}
+                    <Col className="d-flex justify-content-end">
+                        <Button variant="outline-dark">Reset filters</Button>
+                    </Col>
                 </Row>
                 <Row>
                   <div style={{marginTop: 10}}>
@@ -381,8 +384,7 @@ const Home = () => {
                             </Button> : <></>
                         }
                     </Col>
-                    <Col></Col>
-                    <Col>
+                    <Col className="d-flex justify-content-end">
                     <Button variant="light" size='lg' onClick={scrollTop}>
                       <FaArrowCircleUp/>
                     </Button>
