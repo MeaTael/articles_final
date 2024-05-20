@@ -201,7 +201,7 @@ const Article = observer(() => {
       <>
         <Modal centered className="align-self-center" show={showModal} onHide={() => setShowModal(false)}>
           <Modal.Header closeButton>
-            <Modal.Title>Modal heading</Modal.Title>
+            <Modal.Title>Create folder</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form.Control placeholder={"Enter folder name"}
@@ -218,6 +218,7 @@ const Article = observer(() => {
                 name: folderName
               }).then(response => {
                 setFavouriteLists(prevState => prevState.concat(response.data))
+                setFolderName("")
                 setShowModal(false)
               })
             }}>
@@ -353,7 +354,11 @@ const Article = observer(() => {
                 <Button
                     variant="outline-primary"
                     id="button-addon2"
-                    onClick={() => postComment()}>
+                    onClick={() => {
+                      postComment().then(response => {
+                        setCommentText("")
+                      })
+                    }}>
                   →
                 </Button>
               </InputGroup>
