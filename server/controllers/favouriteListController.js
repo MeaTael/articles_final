@@ -40,7 +40,7 @@ class FavouriteListController {
 
     async remove(req, res, next) {
         try {
-            const {id} = req.query
+            const {id} = req.body
             if (!id) {
                 return next(ApiError.badRequest('No user id'))
             }

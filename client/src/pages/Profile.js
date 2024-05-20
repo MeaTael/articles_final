@@ -12,6 +12,8 @@ import {FaArrowCircleUp} from "react-icons/fa";
 import MoonLoader from "react-spinners/ClipLoader";
 import "./home.css"
 import ArticleList from "../components/ArticleList"
+import {Modal} from "react-bootstrap";
+import Form from "react-bootstrap/Form";
 
 let Latex = require('react-latex')
 
@@ -26,6 +28,8 @@ const Profile = observer(() => {
     const [favouriteLists, setFavouriteLists] = useState([])
     const [showTopButton, setShowTopButton] = useState(false)
     const [currFolder, setCurrFolder] = useState(0)
+    const [showModal, setShowModal] = useState(false)
+
 
     const override: CSSProperties = {
         display: "block",
@@ -100,6 +104,41 @@ const Profile = observer(() => {
 
     return (
         <>
+            <Modal centered className="align-self-center" show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Folders list</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <ListGroup>
+                        {favouriteLists.map(list => {
+                            return <ListGroup.Item key={list.id}>
+                                <Row className="d-flex">
+                                    <Col>
+                                        {list.name}
+                                    </Col>
+                                    <Col className="d-flex justify-content-end">
+                                        {list.id === favouriteLists[0].id ? <></> :
+                                            <Button
+                                            variant="danger"
+                                            onClick={async () => {
+                                                await axios.delete('http://localhost:5000/api/favouriteList/remove', {
+                                                    data: {
+                                                        id: list.id
+                                                    }
+                                                }).then(response => {
+                                                    console.log(response.data)
+                                                })
+                                            }}
+                                        >
+                                            Delete
+                                        </Button>}
+                                    </Col>
+                                </Row>
+                            </ListGroup.Item>
+                        })}
+                    </ListGroup>
+                </Modal.Body>
+            </Modal>
             <Row>
             <Col style={{maxWidth: 300, display: "inline-table", marginRight: 10}}>
                 <ListGroup activeKey={currFolder} onSelect={eventKey => setCurrFolder(eventKey)}>
@@ -117,7 +156,15 @@ const Profile = observer(() => {
                         color: '#fff',
                         padding: '15px 20px',
                         borderRight: "1px solid rgba(0, 0, 0, .125)"
-                    }}>Folders</div>
+                    }}>
+                        <Row>
+                            <Col className="align-content-center">Folders</Col>
+                            <Col className="d-flex justify-content-end">
+                                <Button variant="secondary" onClick={() => setShowModal(true)}>
+                                    Manage
+                                </Button></Col>
+                        </Row>
+                    </div>
                     {favouriteLists.map(favList => {
                         return (
                             <ListGroup.Item action eventKey={favList.id} key={favList.id}>

@@ -24,7 +24,7 @@ class UserController {
         }
         const hashPassword = await bcrypt.hash(password, 5)
         const user = await User.create({username, password: hashPassword})
-        const favouriteList = await FavouriteList.create({userId: user.id})
+        const favouriteList = await FavouriteList.create({userId: user.id, name: "Common"})
         const token = generateJwt(user.id, user.username)
         return res.json(token)
     }

@@ -9,7 +9,7 @@ const User = sequelize.define('user', {
 
 const FavouriteList = sequelize.define('favourite_list', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    name: {type: DataTypes.STRING, default: "default"}
+    name: {type: DataTypes.STRING, allowNull: false, default: "Common"}
 })
 
 const Favourite = sequelize.define('favourite', {
@@ -47,7 +47,7 @@ FavouriteList.belongsTo(User)
 User.hasMany(Comment)
 Comment.belongsTo(User)
 
-FavouriteList.hasMany(Favourite)
+FavouriteList.hasMany(Favourite, {onDelete: "CASCADE"})
 Favourite.belongsTo(FavouriteList)
 
 Article.hasMany(Favourite)
