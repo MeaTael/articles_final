@@ -23,7 +23,7 @@ export const publicRoutes = [
         Component: <Article/>
     },
     {
-        path: ARTICLE_ROUTE + '/:id' + '/:fromArticle',
+        path: ARTICLE_ROUTE + '/:id/:fromArticle',
         Component: <ArticleCopy/>
     },
     {

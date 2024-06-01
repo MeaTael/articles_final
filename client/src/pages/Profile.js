@@ -13,13 +13,9 @@ import MoonLoader from "react-spinners/ClipLoader";
 import "./home.css"
 import ArticleList from "../components/ArticleList"
 import {Modal} from "react-bootstrap";
-import Form from "react-bootstrap/Form";
-
-let Latex = require('react-latex')
 
 const Profile = observer(() => {
     const {user} = useContext(Context)
-    const history = useNavigate()
     const PAGE_SIZE = 5
     const [fetching, setFetching] = useState(false)
     const [currPage, setCurrPage] = useState(0)
@@ -28,6 +24,7 @@ const Profile = observer(() => {
     const [favouriteLists, setFavouriteLists] = useState([])
     const [showTopButton, setShowTopButton] = useState(false)
     const [currFolder, setCurrFolder] = useState(0)
+    const [currTitle, setCurrTitle] = useState("")
     const [showModal, setShowModal] = useState(false)
 
 
@@ -47,6 +44,7 @@ const Profile = observer(() => {
         getFavouriteLists().then(response => {
             setFavouriteLists(response.data.rows)
             setCurrFolder(response.data.rows[0].id)
+            setCurrTitle(response.data.rows[0].name)
         })
     }, [])
 
@@ -167,7 +165,7 @@ const Profile = observer(() => {
                     </div>
                     {favouriteLists.map(favList => {
                         return (
-                            <ListGroup.Item action eventKey={favList.id} key={favList.id}>
+                            <ListGroup.Item action eventKey={favList.id} key={favList.id} onClick={() => setCurrTitle(favList.name)}>
                                 {favList.name}
                             </ListGroup.Item>
                         )})}
@@ -175,6 +173,11 @@ const Profile = observer(() => {
             </Col>
                 <Col>
             <Container style={{maxWidth: '800px' }}>
+                <Row>
+                    <Col>
+                        <h2 className="text-center">{currTitle}</h2>
+                    </Col>
+                </Row>
                 {<ArticleList activeKey={currFolder} articles={articles}/>}
                 {!fetching?
                     <Row style={{marginTop: 20}}>

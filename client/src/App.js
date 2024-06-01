@@ -1,9 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
-import Home from './pages/home';
-import Article from './pages/article';
-import ArticleCopy from './pages/articleRef';
+import { BrowserRouter as Router} from 'react-router-dom';
 
 import NavBar from "./components/NavBar";
 import AppRouter from "./components/AppRouter";
@@ -30,13 +26,6 @@ const App = observer( () => {
     }, [])
 
   return (
-    /*<>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="articles/:id" element={<Article/>} />
-        <Route path="articles/:id/:fromArticle" element={<ArticleCopy/>} />
-      </Routes>
-    </>*/
       <Router>
         <NavBar/>
           {loading ? <></> : <AppRouter/>}

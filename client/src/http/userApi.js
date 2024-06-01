@@ -1,4 +1,3 @@
-import React from 'react';
 import {$host, $authHost} from "./index";
 import {jwtDecode} from "jwt-decode";
 
