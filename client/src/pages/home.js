@@ -20,6 +20,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import "./home.css"
 import {observer} from "mobx-react-lite";
 import {Context} from "../index";
+import {HOME_ROUTE} from "../utils/consts";
 
 let Latex = require('react-latex')
 
@@ -49,7 +50,6 @@ const Home = observer(() => {
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             if (!fetching) {
-                console.log(options.options.order)
                 saveOptions()
                 setLastPageReached(false)
                 setSortLoader(true)
@@ -72,8 +72,6 @@ const Home = observer(() => {
                     setArticles(response.data.rows)
                     setCurrentPage(1)
                     setSortLoader(false)
-                }).finally(() => {
-                    console.log(options.options.order)
                 })
             }
         }, 500)
@@ -103,7 +101,6 @@ const Home = observer(() => {
                 }
                 setCurrentPage(prevState => prevState + 1)
                 setArticles(prevState => prevState.concat(response.data.rows))
-                console.log(response.data.rows)
             }).finally(() => {
                 setFetching(false)
                 setSortLoader(false)
@@ -329,7 +326,6 @@ const Home = observer(() => {
                           type="search"
                           placeholder="Search"
                           defaultValue={searchInput === "" ? null : searchInput}
-                          className="me-2"
                           aria-label="Search"
                           onChange={handleSearch}
                         />
@@ -351,7 +347,7 @@ const Home = observer(() => {
                                       onChange={(e) => {handleYearChange(e.target.value)}}/>
                     </Col> : null}
                     <Col className="d-flex justify-content-end">
-                        <Button variant="outline-dark">Reset filters</Button>
+                        <Button variant="outline-dark" href={HOME_ROUTE}>Reset filters</Button>
                     </Col>
                 </Row>
                 <Row>
