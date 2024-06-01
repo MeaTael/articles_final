@@ -1,4 +1,4 @@
-import React, { useEffect, useState, CSSProperties } from 'react';
+import React, {useEffect, useState, CSSProperties, useContext} from 'react';
 import { Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -17,21 +17,23 @@ import {FaArrowCircleUp} from 'react-icons/fa';
 import {FiAlertCircle} from "react-icons/fi";
 import Tooltip from 'react-bootstrap/Tooltip';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import ArticleList from "../components/ArticleList";
 import "./home.css"
+import {observer} from "mobx-react-lite";
+import {Context} from "../index";
 
 let Latex = require('react-latex')
 
-const Home = () => {
+const Home = observer(() => {
+    const {options} = useContext(Context)
     const [articles, setArticles] = useState([])
-    const [sortBy, setSortBy] = useState("articleRating")
-    const [year, setYear] = useState((new Date()).getFullYear())
-    const [yearState, setYearState] = useState((new Date()).getFullYear())
-    const [order, setOrder] = useState(true)
-    const [selectedConfs, setSelectedConfs] = useState([])
-    const [searchInput, setSearchInput] = useState("")
-    const [centralityFilter, setCentralityFilter] = useState(0)
-    const [authorFilter, setAuthorFilter] = useState(0)
+    const [sortBy, setSortBy] = useState(options.options.sortBy)
+    const [year, setYear] = useState(options.options.year)
+    const [yearState, setYearState] = useState(options.options.yearState)
+    const [order, setOrder] = useState(options.options.order)
+    const [selectedConfs, setSelectedConfs] = useState(options.options.selectedConfs)
+    const [searchInput, setSearchInput] = useState(options.options.searchInput)
+    const [centralityFilter, setCentralityFilter] = useState(options.options.centralityFilter)
+    const [authorFilter, setAuthorFilter] = useState(options.options.authorFilter)
     const [currentPage, setCurrentPage] = useState(0)
     const [sortLoader, setSortLoader] = useState(false)
     const [fetching, setFetching] = useState(false)
@@ -47,6 +49,8 @@ const Home = () => {
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             if (!fetching) {
+                console.log(options.options.order)
+                saveOptions()
                 setLastPageReached(false)
                 setSortLoader(true)
                 axios.get("http://localhost:5000/api/article/getAll", {
@@ -68,6 +72,8 @@ const Home = () => {
                     setArticles(response.data.rows)
                     setCurrentPage(1)
                     setSortLoader(false)
+                }).finally(() => {
+                    console.log(options.options.order)
                 })
             }
         }, 500)
@@ -78,6 +84,7 @@ const Home = () => {
 
     useEffect(() => {
         if (fetching && !lastPageReached) {
+            saveOptions()
             setSortLoader(true)
             axios.get("http://localhost:5000/api/article/getAll", {
                 params: {
@@ -100,6 +107,7 @@ const Home = () => {
             }).finally(() => {
                 setFetching(false)
                 setSortLoader(false)
+                console.log(options.options.order)
             })
         }
     }, [fetching])
@@ -114,6 +122,19 @@ const Home = () => {
         return () => clearTimeout(delayDebounceFn)
 
     }, [yearState])
+
+    const saveOptions = () => {
+        options.setOptions({
+            sortBy: sortBy,
+            order: order,
+            selectedConfs: selectedConfs,
+            searchInput: searchInput,
+            centralityFilter: centralityFilter,
+            authorFilter: authorFilter,
+            year: year,
+            yearState: yearState
+        })
+    }
 
     const scrollHandler = (e) => {
         const docElem = e.target.documentElement
@@ -254,6 +275,7 @@ const Home = () => {
                               data-content="Select conference(s)">
                             <ReactSelect options={confs}
                                          isMulti
+                                         defaultValue={selectedConfs}
                                          closeMenuOnSelect={false}
                                          hideSelectedOptions={false}
                                          components={{Option}}
@@ -267,6 +289,7 @@ const Home = () => {
                     <Col md='auto'>
                         <Form.Control type="number"
                             placeholder='Minimal article rating'
+                            defaultValue={centralityFilter === 0 ? null : centralityFilter}
                             onChange={(e) => {handleCentralityChange(e.target.value)}}/>                        
                     </Col>
                     <Col md="auto">
@@ -291,6 +314,7 @@ const Home = () => {
                     <Col md='auto'>
                       <Form.Control type="number"
                         placeholder='Minimal author rating'
+                        defaultValue={authorFilter === 0 ? null : centralityFilter}
                         onChange={(e) => {handleAuthorChange(e.target.value)}}/>
                     </Col>
                 </Row>
@@ -304,6 +328,7 @@ const Home = () => {
                         <Form.Control
                           type="search"
                           placeholder="Search"
+                          defaultValue={searchInput === "" ? null : searchInput}
                           className="me-2"
                           aria-label="Search"
                           onChange={handleSearch}
@@ -322,6 +347,7 @@ const Home = () => {
                     {yearState === "Custom year" ? <Col md='auto'>
                         <Form.Control type="number"
                                       placeholder='Choose year'
+                                      defaultValue={year}
                                       onChange={(e) => {handleYearChange(e.target.value)}}/>
                     </Col> : null}
                     <Col className="d-flex justify-content-end">
@@ -404,6 +430,6 @@ const Home = () => {
         </>
     )
 
-}
+})
 
 export default Home;

@@ -19,7 +19,7 @@ const NavBar = observer(() => {
     return (
         <Navbar bg="dark" expand="lg" variant="dark">
             <Container>
-                <Navbar.Brand href={HOME_ROUTE}>Machine Learning Articles</Navbar.Brand>
+                <Navbar.Brand as="div" style={{cursor: "pointer"}} onClick={() => history(HOME_ROUTE)}>Machine Learning Articles</Navbar.Brand>
                 {user.isAuth ?
                     <Nav className={'ml-auto'}>
                         <Button variant={"outline-light"} className="m-lg-2" onClick={() => history(PROFILE_ROUTE)}>Profile</Button>
